@@ -24,7 +24,7 @@
 #include "hardware/timer.h"
 #include "hardware/gpio.h"
 #include "hardware/flash.h"
-#include "ss_oled.h"
+#include "OneBitDisplay.h"
 
 #include "pico/stdio.h"
 #include "pico/time.h"
@@ -68,7 +68,7 @@ static const uint I2C_SLAVE_SCL_PIN = 1;
 // RPI Pico
 
 int rc;
-SSOLED oled;
+OBDISP oled;
 static uint8_t ucBuffer[1024];
 bool screenflip = false;
 
@@ -465,152 +465,152 @@ static void draw_main_screen(bool force){
         case STATE_IDLE : //jogging is allowed
         if (packet->jog_mode!=previous_packet->jog_mode || packet->jog_stepsize!=previous_packet->jog_stepsize || force){
           sprintf(charbuf, "        : %3.3f ", packet->jog_stepsize);
-          oledWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, 0, 1);
+          obdWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, OBD_BLACK, 1);
           switch (current_jogmode) {
             case FAST :
             case SLOW : 
-              oledWriteString(&oled, 0,0,INFOLINE,(char *)"JOG FEED", INFOFONT, 0, 1); 
+              obdWriteString(&oled, 0,0,INFOLINE,(char *)"JOG FEED", INFOFONT, OBD_BLACK, 1); 
               break;
             case STEP : 
-              oledWriteString(&oled, 0,0,INFOLINE,(char *)"JOG STEP", INFOFONT, 0, 1);
+              obdWriteString(&oled, 0,0,INFOLINE,(char *)"JOG STEP", INFOFONT, OBD_BLACK, 1);
               break;
             default :
-              //oledWriteString(&oled, 0,0,INFOLINE,(char *)"ERR ", INFOFONT, 0, 1);
+              //obdWriteString(&oled, 0,0,INFOLINE,(char *)"ERR ", INFOFONT, OBD_BLACK, 1);
             break; 
               }//close jog states
         }
 
         if (packet->current_wcs != previous_packet->current_wcs || force){
-          oledWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,-1,-1,(char *)"  ", FONT_6x8, 0, 1);
+          obdWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,-1,-1,(char *)"  ", FONT_6x8, OBD_BLACK, 1);
         }
 
-        oledWriteString(&oled, 0,94,4,(char *)" ", FONT_6x8, 0, 1);
+        obdWriteString(&oled, 0,94,4,(char *)" ", FONT_6x8, OBD_BLACK, 1);
         switch (packet->machine_state){
           case STATE_IDLE :
-          oledWriteString(&oled, 0,-1,-1,(char *)"IDLE", FONT_6x8, 0, 1); 
+          obdWriteString(&oled, 0,-1,-1,(char *)"IDLE", FONT_6x8, OBD_BLACK, 1); 
           break;
           case STATE_JOG :
-          oledWriteString(&oled, 0,-1,-1,(char *)"JOG ", FONT_6x8, 0, 1);
+          obdWriteString(&oled, 0,-1,-1,(char *)"JOG ", FONT_6x8, OBD_BLACK, 1);
           break;
           case STATE_TOOL_CHANGE :
-          oledWriteString(&oled, 0,-1,-1,(char *)"TOOL", FONT_6x8, 0, 1); 
+          obdWriteString(&oled, 0,-1,-1,(char *)"TOOL", FONT_6x8, OBD_BLACK, 1); 
           break;                   
         }
-        //oledWriteString(&oled, 0,0,5,(char *)"              ", FONT_6x8, 0, 1);
+        //obdWriteString(&oled, 0,0,5,(char *)"              ", FONT_6x8, OBD_BLACK, 1);
         //sprintf(charbuf, "%d %d %d  ", direction_pressed, previous_direction_pressed, transition_delay);
-        //oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1); 
+        //obdWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, OBD_BLACK, 1); 
 
-        //oledWriteString(&oled, 2,0,2,(char *)"        ", FONT_8x8, 0, 1);
+        //obdWriteString(&oled, 2,0,2,(char *)"        ", FONT_8x8, OBD_BLACK, 1);
         if(packet->x_coordinate != previous_packet->x_coordinate || 
            packet->y_coordinate != previous_packet->y_coordinate || 
            packet->z_coordinate != previous_packet->z_coordinate || 
            packet->a_coordinate != previous_packet->a_coordinate || force){
           sprintf(charbuf, "X %8.3F", packet->x_coordinate);
-          oledWriteString(&oled, 0,0,2,charbuf, FONT_8x8, 0, 1);
+          obdWriteString(&oled, 0,0,2,charbuf, FONT_8x8, OBD_BLACK, 1);
           //}
-          //oledWriteString(&oled, 2,0,3,(char *)"        ", FONT_8x8, 0, 1);
+          //obdWriteString(&oled, 2,0,3,(char *)"        ", FONT_8x8, OBD_BLACK, 1);
           //if(packet->y_coordinate != previous_packet.y_coordinate || force){ 
             sprintf(charbuf, "Y %8.3F", packet->y_coordinate);
-            oledWriteString(&oled, 0,0,3,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,3,charbuf, FONT_8x8, OBD_BLACK, 1);
           //}
-          //oledWriteString(&oled, 2,0,4,(char *)"        ", FONT_8x8, 0, 1);
+          //obdWriteString(&oled, 2,0,4,(char *)"        ", FONT_8x8, OBD_BLACK, 1);
           //if(packet->z_coordinate != previous_packet.z_coordinate || force){ 
             sprintf(charbuf, "Z %8.3F", packet->z_coordinate);
-            oledWriteString(&oled, 0,0,4,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,4,charbuf, FONT_8x8, OBD_BLACK, 1);
           //}
           if(packet->a_coordinate < 65535){          
             sprintf(charbuf, "A %8.3F", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);
           }else if (command_error){
             sprintf(charbuf, "COMMAND ERR", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);
             sleep_ms(100);            
           }else{
             sprintf(charbuf, "           ", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);            
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);            
           }
         }          
 
-        oledWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, 0, 1);            
+        obdWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, OBD_BLACK, 1);            
 
         sprintf(charbuf, "S:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-        oledWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, 0, 1);
+        obdWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, OBD_BLACK, 1);
         //this is the RPM number
         sprintf(charbuf, "%5d", packet->spindle_rpm);
-        oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1);            
+        obdWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, OBD_BLACK, 1);            
         break;//close idle state
 
         case STATE_CYCLE :
           //can still adjust overrides during hold
           //no jog during hold, show feed rate.
           sprintf(charbuf, "        : %3.3f ", packet->feed_rate);
-          oledWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, 0, 1);
+          obdWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, OBD_BLACK, 1);
 
-          oledWriteString(&oled, 0,0,INFOLINE,(char *)"RUN FEED", INFOFONT, 0, 1); 
+          obdWriteString(&oled, 0,0,INFOLINE,(char *)"RUN FEED", INFOFONT, OBD_BLACK, 1); 
 
-          oledWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, 0, 1);   
+          obdWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, OBD_BLACK, 1);   
 
-          oledWriteString(&oled, 0,0,4,(char *)"                ", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,-1,-1,(char *)"RUN  ", FONT_6x8, 0, 1); 
+          obdWriteString(&oled, 0,0,4,(char *)"                ", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,-1,-1,(char *)"RUN  ", FONT_6x8, OBD_BLACK, 1); 
 
-          oledWriteString(&oled, 2,0,2,(char *)"        ", FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 2,0,2,(char *)"        ", FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "X %8.3F", packet->x_coordinate);
-          oledWriteString(&oled, 0,0,2,charbuf, FONT_8x8, 0, 1);
-          oledWriteString(&oled, 2,0,3,(char *)"        ", FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 0,0,2,charbuf, FONT_8x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 2,0,3,(char *)"        ", FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "Y %8.3F", packet->y_coordinate);
-          oledWriteString(&oled, 0,0,3,charbuf, FONT_8x8, 0, 1);
-          oledWriteString(&oled, 2,0,4,(char *)"        ", FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 0,0,3,charbuf, FONT_8x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 2,0,4,(char *)"        ", FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "Z %8.3F", packet->z_coordinate);
-          oledWriteString(&oled, 0,0,4,charbuf, FONT_8x8, 0, 1);
+          obdWriteString(&oled, 0,0,4,charbuf, FONT_8x8, OBD_BLACK, 1);
           if(packet->a_coordinate != 0xFFFFFFFF){ 
             sprintf(charbuf, "A %8.3F", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);
           }else{
             sprintf(charbuf, "          ", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);            
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);            
           }         
 
-          oledWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, 0, 1);          
+          obdWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, OBD_BLACK, 1);          
 
           sprintf(charbuf, "S:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-          oledWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, 0, 1);
+          obdWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, OBD_BLACK, 1);
           //this is the RPM number
           sprintf(charbuf, "%5d", packet->spindle_rpm);
-          oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1);    
+          obdWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, OBD_BLACK, 1);    
         break; //close cycle case        
 
         case STATE_HOLD :
           //can still adjust overrides during hold
           //no jog during hold
-          oledWriteString(&oled, 0,0,INFOLINE,(char *)"    HOLDING     ", JOGFONT, 0, 1);
+          obdWriteString(&oled, 0,0,INFOLINE,(char *)"    HOLDING     ", JOGFONT, OBD_BLACK, 1);
           //can still adjust overrides during hold
-          oledWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, 0, 1);   
+          obdWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, OBD_BLACK, 1);   
 
           sprintf(charbuf, "X %8.3F", packet->x_coordinate);
-          oledWriteString(&oled, 0,0,2,charbuf, FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 0,0,2,charbuf, FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "Y %8.3F", packet->y_coordinate);
-          oledWriteString(&oled, 0,0,3,charbuf, FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 0,0,3,charbuf, FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "Z %8.3F", packet->z_coordinate);
-          oledWriteString(&oled, 0,0,4,charbuf, FONT_8x8, 0, 1);
+          obdWriteString(&oled, 0,0,4,charbuf, FONT_8x8, OBD_BLACK, 1);
           if(packet->a_coordinate != 0xFFFFFFFF){ 
             sprintf(charbuf, "A %8.3F", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);
           }else{
             sprintf(charbuf, "          ", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);            
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);            
           }           
 
-          oledWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, 0, 1);            
+          obdWriteString(&oled, 0,0,6,(char *)"                 RPM", FONT_6x8, OBD_BLACK, 1);            
 
           sprintf(charbuf, "S:%3d  F:%3d    ", packet->spindle_override, packet->feed_override);
-          oledWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, 0, 1);
+          obdWriteString(&oled, 0,0,BOTTOMLINE,charbuf, FONT_6x8, OBD_BLACK, 1);
           //this is the RPM number
           sprintf(charbuf, "%5d", packet->spindle_rpm);
-          oledWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, 0, 1);                
+          obdWriteString(&oled, 0,-1,-1,charbuf, FONT_6x8, OBD_BLACK, 1);                
         break; //close hold case
 
         case STATE_TOOL_CHANGE :
@@ -618,53 +618,53 @@ static void draw_main_screen(bool force){
           //cannot adjust overrides during tool change
           //jogging allowed during tool change
           sprintf(charbuf, "        : %3.3f ", packet->jog_stepsize);
-          oledWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, 0, 1);
+          obdWriteString(&oled, 0,0,INFOLINE,charbuf, INFOFONT, OBD_BLACK, 1);
           switch (current_jogmode) {
             case FAST :
             case SLOW : 
-              oledWriteString(&oled, 0,0,INFOLINE,(char *)"JOG FEED", INFOFONT, 0, 1); 
+              obdWriteString(&oled, 0,0,INFOLINE,(char *)"JOG FEED", INFOFONT, OBD_BLACK, 1); 
               break;
             case STEP : 
-              oledWriteString(&oled, 0,0,INFOLINE,(char *)"JOG STEP", INFOFONT, 0, 1);
+              obdWriteString(&oled, 0,0,INFOLINE,(char *)"JOG STEP", INFOFONT, OBD_BLACK, 1);
               break;
             default :
             break; 
               }//close jog states
-          oledWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, 0, 1);             
+          obdWriteString(&oled, 0,0,2,(char *)"                G", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,-1,-1,map_coord_system(packet->current_wcs), FONT_6x8, OBD_BLACK, 1);             
 
           sprintf(charbuf, "X %8.3F", packet->x_coordinate);
-          oledWriteString(&oled, 0,0,2,charbuf, FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 0,0,2,charbuf, FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "Y %8.3F", packet->y_coordinate);
-          oledWriteString(&oled, 0,0,3,charbuf, FONT_8x8, 0, 1); 
+          obdWriteString(&oled, 0,0,3,charbuf, FONT_8x8, OBD_BLACK, 1); 
           sprintf(charbuf, "Z %8.3F", packet->z_coordinate);
-          oledWriteString(&oled, 0,0,4,charbuf, FONT_8x8, 0, 1);         
+          obdWriteString(&oled, 0,0,4,charbuf, FONT_8x8, OBD_BLACK, 1);         
           if(packet->a_coordinate != 0xFFFFFFFF){ 
             sprintf(charbuf, "A %8.3F", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);
           }else{
             sprintf(charbuf, "          ", packet->a_coordinate);
-            oledWriteString(&oled, 0,0,5,charbuf, FONT_8x8, 0, 1);            
+            obdWriteString(&oled, 0,0,5,charbuf, FONT_8x8, OBD_BLACK, 1);            
           }
-          oledWriteString(&oled, 0,0,BOTTOMLINE,(char *)" TOOL CHANGE", INFOFONT, 0, 1);
+          obdWriteString(&oled, 0,0,BOTTOMLINE,(char *)" TOOL CHANGE", INFOFONT, OBD_BLACK, 1);
         break; //close tool case
 
         case STATE_HOMING : //no overrides during homing
-          oledFill(&oled, 0,1);
-          oledWriteString(&oled, 0,0,0,(char *)" *****************", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,0,7,(char *)" *****************", FONT_6x8, 0, 1);
+          obdFill(&oled, OBD_WHITE,1);
+          obdWriteString(&oled, 0,0,0,(char *)" *****************", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,0,7,(char *)" *****************", FONT_6x8, OBD_BLACK, 1);
           //no jog during hold
-          oledWriteString(&oled, 0,0,4,(char *)"HOMING", JOGFONT, 0, 1);
+          obdWriteString(&oled, 0,0,4,(char *)"HOMING", JOGFONT, OBD_BLACK, 1);
         break; //close home case
 
         case STATE_ALARM : //no overrides during homing
-          oledFill(&oled, 0,1);
-          oledWriteString(&oled, 0,0,0,(char *)" *****************", FONT_6x8, 0, 1);
-          oledWriteString(&oled, 0,0,7,(char *)" *****************", FONT_6x8, 0, 1);
+          obdFill(&oled, OBD_WHITE,1);
+          obdWriteString(&oled, 0,0,0,(char *)" *****************", FONT_6x8, OBD_BLACK, 1);
+          obdWriteString(&oled, 0,0,7,(char *)" *****************", FONT_6x8, OBD_BLACK, 1);
           //no jog during hold
-          oledWriteString(&oled, 0,0,3,(char *)"ALARM", JOGFONT, 0, 1);
+          obdWriteString(&oled, 0,0,3,(char *)"ALARM", JOGFONT, OBD_BLACK, 1);
           sprintf(charbuf, "Code: %d ", packet->alarm);
-          oledWriteString(&oled, 0,0,4,charbuf, INFOFONT, 0, 1);        
+          obdWriteString(&oled, 0,0,4,charbuf, INFOFONT, OBD_BLACK, 1);        
         break; //close home case                               
         default :
 
@@ -851,13 +851,13 @@ uint8_t uc[8];
 int i, j;
 char szTemp[32];
     
-rc = oledInit(&oled, OLED_128x64, 0x3c, screenflip, 0, 0, SDA_PIN, SCL_PIN, RESET_PIN, 1000000L);
-oledSetBackBuffer(&oled, ucBuffer);
-oledFill(&oled, 0,1);
-oledWriteString(&oled, 0,0,1,(char *)"GRBLHAL", FONT_12x16, 0, 1);
-oledWriteString(&oled, 0,0,4,(char *)"I2C JOGGER", FONT_12x16, 0, 1);
+rc = obdI2CInit(&oled, OLED_128x64, 0x3c, screenflip, 0, 0, SDA_PIN, SCL_PIN, RESET_PIN, 1000000L);
+obdSetBackBuffer(&oled, ucBuffer);
+obdFill(&oled, OBD_WHITE,1);
+obdWriteString(&oled, 0,0,1,(char *)"GRBLHAL", FONT_12x16, OBD_BLACK, 1);
+obdWriteString(&oled, 0,0,4,(char *)"I2C JOGGER", FONT_12x16, OBD_BLACK, 1);
 sleep_ms(750);
-oledFill(&oled, 0,1);
+obdFill(&oled, OBD_WHITE,1);
 
 draw_main_screen(1);
 
