@@ -31,8 +31,8 @@
 #include <tusb.h>
 #include "Adafruit_NeoPixel.hpp"
 
-#include <i2c_fifo.h>
-#include <i2c_slave.h>
+#include "i2c_fifo.h"
+#include "pico/i2c_slave.h"
 
 #include "i2c_jogger.h"
 
